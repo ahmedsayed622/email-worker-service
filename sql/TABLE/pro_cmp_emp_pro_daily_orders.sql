@@ -1,0 +1,33 @@
+create or replace procedure cmp_emp_pro_daily_orders as 
+  v_rowcount NUMBER;
+begin
+
+INSERT INTO CMP_EMP_TBL_DAILY_ORDERS (PROFILE_ID, CUSTOMER_NAME_EN, INVOICE_DATE, INVOICE_NO, EXECID, STOCK_ID, QUNTY, SECOND_PROFILE, FLAG)
+
+select C.PROFILE_ID , C.CUSTOMER_NAME_EN , A.INVOICE_DATE , A.INVOICE_NO, SUBSTR(b.EXECID ,14,18) as "EXECID", 
+A.STOCK_ID, B.QUNTY ,
+(select F.PROFILE_ID
+from BO_INVOICE_HEADER f
+inner join BO_INVOICE_DETAIL g on f.INVOICE_TRNX_ID = g.INVOICE_TRNX_ID where f.OPERATION_ID <> a.OPERATION_ID
+ and SUBSTR(g.EXECID ,14,18) = SUBSTR(B.EXECID ,14,18) ) as "SECOND_PROFILE" , 1 as "FLAG"
+from BO_INVOICE_HEADER a
+inner join BO_INVOICE_DETAIL b on A.INVOICE_TRNX_ID = B.INVOICE_TRNX_ID
+inner join T_PROFILE_INFO_SETTING c on A.PROFILE_ID = c.PROFILE_ID
+where A.INVOICE_DATE = Edata_Getdate(SYSDATE) AND C.ISEMPLOYEE = 1 and SUBSTR(B.EXECID ,14,18) in 
+(select SUBSTR(e.EXECID ,14,18)	
+from BO_INVOICE_HEADER d
+inner join BO_INVOICE_DETAIL e on d.INVOICE_TRNX_ID = e.INVOICE_TRNX_ID where D.OPERATION_ID <> a.OPERATION_ID  )
+order by A.INVOICE_DATE;
+
+-- Check if no rows were inserted
+v_rowcount := SQL%ROWCOUNT;
+
+IF v_rowcount = 0 THEN
+  -- No data found, insert placeholder record with today's date and flag = 0
+  INSERT INTO CMP_EMP_TBL_DAILY_ORDERS (INVOICE_DATE, FLAG)
+  VALUES (TO_NUMBER(TO_CHAR(SYSDATE, 'YYYYMMDD')), 0);
+END IF;
+
+COMMIT;
+
+end cmp_emp_pro_daily_orders;

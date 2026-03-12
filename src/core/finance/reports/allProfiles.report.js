@@ -1,0 +1,16 @@
+export const allProfiles = {
+  id: 'fin-all-profiles',
+  name: 'All Profiles',
+  sql: 'core/finance/sql/AlAhlyConfirmationafterEndOfDayForAccountingTeam/all_profile.sql',
+  format: 'xlsx',
+  sheetName: 'All_Profiles',
+  fileName: 'all profiles ({CLOSE_DATE}).xlsx',
+  recipients: ['finance@alahlypharos.com'],
+  subject: 'Al Ahly Confirmation All Profiles - {CLOSE_DATE}',
+  trigger: 'day-close',
+  triggerType: 'FIN_CLOSE',
+  requiredParams: ['close_date'],
+  exportWhenEmpty: true,
+  enabled: true,
+  useDateFolder: true,
+};

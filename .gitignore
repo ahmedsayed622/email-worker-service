@@ -1,0 +1,22 @@
+﻿node_modules/
+.env
+.env.development
+.env.production
+data/reports/
+logs/
+export/
+*.log
+.DS_Store
+
+# Environment local overrides (contain secrets)
+.env.local
+.env.development.local
+.env.production.local
+.env.*.local
+
+# System service files with secrets
+email-worker.service
+
+# Temporary files
+.codex_tmp_patch/
+*.tmp

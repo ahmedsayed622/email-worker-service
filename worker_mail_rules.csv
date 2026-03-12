@@ -1,0 +1,2 @@
+"RULE_ID","DOMAIN","REPORT_CODE","EVENT_TYPE","IS_ACTIVE","NOTIFY_ENABLED","SUBJECT_SUFFIX","TEMPLATE_KEY","SIGNATURE_KEY","FROM_ADDRESS","CREATED_AT","UPDATED_AT"
+1,"finance","","NO_DATA","Y","Y"," - No Data","no_data_v1","default_v1","ahmed.zaghlol@alahlypharos.com",21-FEB-26 06.57.58.497305000 AM,

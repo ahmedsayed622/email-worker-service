@@ -1,0 +1,30 @@
+﻿{
+  "name": "email-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Day Close Report Automation - Email Worker Service",
+  "scripts": {
+    "start": "node src/app/worker.js",
+    "start:dev": "cross-env NODE_ENV=development node --watch src/app/worker.js",
+    "start:prod": "cross-env NODE_ENV=production node src/app/worker.js",
+    "dev": "npm run start:dev",
+    "prod": "npm run start:prod",
+    "service:status": "sudo systemctl status email-worker",
+    "service:start": "sudo systemctl start email-worker",
+    "service:stop": "sudo systemctl stop email-worker",
+    "service:restart": "sudo systemctl restart email-worker",
+    "service:logs": "sudo journalctl -u email-worker -f",
+    "service:enable": "sudo systemctl enable email-worker",
+    "service:disable": "sudo systemctl disable email-worker"
+  },
+  "dependencies": {
+    "dotenv-flow": "^4.1.0",
+    "exceljs": "^4.4.0",
+    "nodemailer": "^6.10.1",
+    "oracledb": "^6.10.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Report</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      color: #1f2a37;
+      direction: ltr;
+      text-align: left;
+    }
+    .container {
+      max-width: 720px;
+      margin: 24px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+    .header {
+      background: #003366;
+      color: #ffffff;
+      padding: 20px 24px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 20px 24px;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 10px 0;
+      font-size: 14px;
+    }
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    .table th {
+      background: #f0f4f8;
+      color: #374151;
+      width: 40%;
+    }
+    .note {
+      margin-top: 12px;
+      color: #374151;
+    }
+    .footer {
+      background: #f9fafb;
+      color: #6b7280;
+      padding: 16px 24px;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Daily Close Reports</div>
+    <div class="content">
+      <p>Hello,</p>
+      <p>Please be informed that the following report has been generated successfully:</p>
+      <table class="table">
+        <tr>
+          <th>Report Name</th>
+          <td>{{reportName}}</td>
+        </tr>
+        <tr>
+          <th>Close Date</th>
+          <td>{{closeDate}}</td>
+        </tr>
+        <tr>
+          <th>Row Count</th>
+          <td>{{rowCount}}</td>
+        </tr>
+        <tr>
+          <th>File Name</th>
+          <td>{{fileName}}</td>
+        </tr>
+      </table>
+      <p class="note">The report is attached to this email.</p>
+      {{{signatureHtml}}}
+    </div>
+    <div class="footer">This is an automated email from the Reports System - Al Ahly Pharos</div>
+  </div>
+</body>
+</html>
