@@ -1,0 +1,19 @@
+# Favor JavaScript detection for the actual application source
+*.js linguist-language=JavaScript
+*.mjs linguist-language=JavaScript
+*.cjs linguist-language=JavaScript
+
+# Exclude documentation and data-like files from language statistics
+*.md linguist-detectable=false
+*.txt linguist-detectable=false
+*.log linguist-detectable=false
+*.csv linguist-detectable=false
+*.sql linguist-detectable=false
+*.html linguist-detectable=false
+*.json linguist-detectable=false
+*.service linguist-detectable=false
+
+# Exclude non-source folders from GitHub language breakdown
+docs/** linguist-detectable=false
+logs/** linguist-detectable=false
+data/** linguist-detectable=false
