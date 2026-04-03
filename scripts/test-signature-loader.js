@@ -12,8 +12,8 @@ import fs from 'node:fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Inline the signature loading logic to avoid env validation errors
-const rootDir = __dirname;
+// Fix: rootDir should be the project root, not script dir
+const rootDir = path.resolve(__dirname, '..');
 const signaturesDir = path.join(rootDir, 'src/templates/shared/signatures/en/raw');
 const signatureHtmlPath = path.join(signaturesDir, 'AlahlyINV_Signature.htm');
 
@@ -75,7 +75,7 @@ async function getDefaultSignatureHtml() {
     const rawHtml = await readFile(signatureHtmlPath, 'utf8');
     return await inlineImages(rawHtml);
   } catch (err) {
-    throw new Error(`Failed to load signature: ${err.message}`);
+    throw new Error(`Failed to load signature from ${signatureHtmlPath}: ${err.message}`);
   }
 }
 
@@ -85,7 +85,7 @@ async function testSignatureLoader() {
   
   try {
     // 1. Test signature loading
-    console.log('1. Loading signature HTML from raw folder...');
+    console.log(`1. Loading signature HTML from ${signatureHtmlPath}...`);
     const signatureHtml = await getDefaultSignatureHtml();
     
     if (!signatureHtml) {
@@ -118,7 +118,7 @@ async function testSignatureLoader() {
     
     // 4. Check file location
     console.log('4. Verifying file location...');
-    const expectedPath = 'src/templates/shared/signatures/en/raw/AlahlyINV_Signature.htm';
+    const expectedPath = path.join(rootDir, 'src/templates/shared/signatures/en/raw/AlahlyINV_Signature.htm');
     if (fs.existsSync(expectedPath)) {
       console.log(`✅ PASS: Signature file exists at ${expectedPath}`);
     } else {
@@ -126,7 +126,7 @@ async function testSignatureLoader() {
       process.exit(1);
     }
     
-    const expectedImagesDir = 'src/templates/shared/signatures/en/raw/AlahlyINV_Signature_files';
+    const expectedImagesDir = path.join(rootDir, 'src/templates/shared/signatures/en/raw/AlahlyINV_Signature_files');
     if (fs.existsSync(expectedImagesDir)) {
       const imageFiles = fs.readdirSync(expectedImagesDir).filter(f => f.endsWith('.png'));
       console.log(`✅ PASS: Images folder exists with ${imageFiles.length} PNG files`);
