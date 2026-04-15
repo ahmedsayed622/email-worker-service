@@ -424,3 +424,136 @@ ORDER BY r.DOMAIN, r.REPORT_CODE, r.EVENT_TYPE, r.LANGUAGE_CODE;
 */
 
 -- End of script
+
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- PATCH: Monthly DOB Notifications (cmp-monthly-dob)
+-- Trigger: MONTH_START  |  Domain: compliance
+-- Date: 2026-04-01
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- STEP A: Template Registry — monthly_v1 + monthly_no_data_v1
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO WORKER_MAIL_TEMPLATE_REGISTRY
+  (TEMPLATE_KEY, LANGUAGE_CODE, DIRECTION, SUBJECT_TPL, BODY_FILE, IS_ACTIVE, CREATED_AT)
+VALUES
+  ('monthly_v1', 'EN', 'LTR', NULL, 'src/templates/shared/emails/monthly.en.html', 'Y', SYSTIMESTAMP);
+
+INSERT INTO WORKER_MAIL_TEMPLATE_REGISTRY
+  (TEMPLATE_KEY, LANGUAGE_CODE, DIRECTION, SUBJECT_TPL, BODY_FILE, IS_ACTIVE, CREATED_AT)
+VALUES
+  ('monthly_v1', 'AR', 'RTL', NULL, 'src/templates/shared/emails/monthly.ar.html', 'Y', SYSTIMESTAMP);
+
+INSERT INTO WORKER_MAIL_TEMPLATE_REGISTRY
+  (TEMPLATE_KEY, LANGUAGE_CODE, DIRECTION, SUBJECT_TPL, BODY_FILE, IS_ACTIVE, CREATED_AT)
+VALUES
+  ('monthly_no_data_v1', 'EN', 'LTR', NULL, 'src/templates/shared/emails/monthly_no_data.en.html', 'Y', SYSTIMESTAMP);
+
+INSERT INTO WORKER_MAIL_TEMPLATE_REGISTRY
+  (TEMPLATE_KEY, LANGUAGE_CODE, DIRECTION, SUBJECT_TPL, BODY_FILE, IS_ACTIVE, CREATED_AT)
+VALUES
+  ('monthly_no_data_v1', 'AR', 'RTL', NULL, 'src/templates/shared/emails/monthly_no_data.ar.html', 'Y', SYSTIMESTAMP);
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- STEP B: Group — CMP_GROUP_MONTHLY (GROUP_ID = 4)
+-- Members are managed via WORKER_EMAIL_MANAGE procedure
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO WORKER_MAIL_GROUP
+  (GROUP_ID, GROUP_CODE, GROUP_NAME, IS_ACTIVE, CREATED_AT)
+VALUES
+  (4, 'CMP_GROUP_MONTHLY', 'Compliance Monthly Group', 'Y', SYSTIMESTAMP);
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- STEP C: Mail Rules — cmp-monthly-dob (RULE_IDs 13–16)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Rule 13: Compliance Monthly - DATA - EN (PRIMARY)
+INSERT INTO WORKER_MAIL_RULES
+  (RULE_ID, DOMAIN, REPORT_CODE, EVENT_TYPE, LANGUAGE_CODE,
+   IS_ACTIVE, NOTIFY_ENABLED,
+   SUBJECT_SUFFIX, TEMPLATE_KEY, SIGNATURE_KEY, FROM_ADDRESS,
+   CREATED_AT, UPDATED_AT)
+VALUES
+  (13, 'compliance', 'cmp-monthly-dob', 'DATA', 'EN',
+   'Y', 'Y',
+   NULL, 'monthly_v1', 'default_v1', 'reports@alahlypharos.com',
+   SYSTIMESTAMP, SYSTIMESTAMP);
+
+-- Rule 14: Compliance Monthly - NO_DATA - EN
+INSERT INTO WORKER_MAIL_RULES
+  (RULE_ID, DOMAIN, REPORT_CODE, EVENT_TYPE, LANGUAGE_CODE,
+   IS_ACTIVE, NOTIFY_ENABLED,
+   SUBJECT_SUFFIX, TEMPLATE_KEY, SIGNATURE_KEY, FROM_ADDRESS,
+   CREATED_AT, UPDATED_AT)
+VALUES
+  (14, 'compliance', 'cmp-monthly-dob', 'NO_DATA', 'EN',
+   'Y', 'Y',
+   ' - No Data', 'monthly_no_data_v1', 'default_v1', 'reports@alahlypharos.com',
+   SYSTIMESTAMP, SYSTIMESTAMP);
+
+-- Rule 15: Compliance Monthly - DATA - AR (backup)
+INSERT INTO WORKER_MAIL_RULES
+  (RULE_ID, DOMAIN, REPORT_CODE, EVENT_TYPE, LANGUAGE_CODE,
+   IS_ACTIVE, NOTIFY_ENABLED,
+   SUBJECT_SUFFIX, TEMPLATE_KEY, SIGNATURE_KEY, FROM_ADDRESS,
+   CREATED_AT, UPDATED_AT)
+VALUES
+  (15, 'compliance', 'cmp-monthly-dob', 'DATA', 'AR',
+   'Y', 'Y',
+   NULL, 'monthly_v1', 'default_v1', 'reports@alahlypharos.com',
+   SYSTIMESTAMP, SYSTIMESTAMP);
+
+-- Rule 16: Compliance Monthly - NO_DATA - AR (backup)
+INSERT INTO WORKER_MAIL_RULES
+  (RULE_ID, DOMAIN, REPORT_CODE, EVENT_TYPE, LANGUAGE_CODE,
+   IS_ACTIVE, NOTIFY_ENABLED,
+   SUBJECT_SUFFIX, TEMPLATE_KEY, SIGNATURE_KEY, FROM_ADDRESS,
+   CREATED_AT, UPDATED_AT)
+VALUES
+  (16, 'compliance', 'cmp-monthly-dob', 'NO_DATA', 'AR',
+   'Y', 'Y',
+   ' - لا توجد بيانات', 'monthly_no_data_v1', 'default_v1', 'reports@alahlypharos.com',
+   SYSTIMESTAMP, SYSTIMESTAMP);
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- STEP D: Rule Targets — link all 4 rules → CMP_GROUP_MONTHLY (GROUP_ID = 4)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO WORKER_MAIL_RULE_TARGET
+  (TARGET_ID, RULE_ID, RECIP_TYPE, TARGET_KIND, ADDRESS_ID, GROUP_ID, IS_ACTIVE, CREATED_AT)
+VALUES
+  (13, 13, 'TO', 'GROUP', NULL, 4, 'Y', SYSTIMESTAMP);  -- Rule 13: DATA EN
+
+INSERT INTO WORKER_MAIL_RULE_TARGET
+  (TARGET_ID, RULE_ID, RECIP_TYPE, TARGET_KIND, ADDRESS_ID, GROUP_ID, IS_ACTIVE, CREATED_AT)
+VALUES
+  (14, 14, 'TO', 'GROUP', NULL, 4, 'Y', SYSTIMESTAMP);  -- Rule 14: NO_DATA EN
+
+INSERT INTO WORKER_MAIL_RULE_TARGET
+  (TARGET_ID, RULE_ID, RECIP_TYPE, TARGET_KIND, ADDRESS_ID, GROUP_ID, IS_ACTIVE, CREATED_AT)
+VALUES
+  (15, 15, 'TO', 'GROUP', NULL, 4, 'Y', SYSTIMESTAMP);  -- Rule 15: DATA AR
+
+INSERT INTO WORKER_MAIL_RULE_TARGET
+  (TARGET_ID, RULE_ID, RECIP_TYPE, TARGET_KIND, ADDRESS_ID, GROUP_ID, IS_ACTIVE, CREATED_AT)
+VALUES
+  (16, 16, 'TO', 'GROUP', NULL, 4, 'Y', SYSTIMESTAMP);  -- Rule 16: NO_DATA AR
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- NOTE: Add members to CMP_GROUP_MONTHLY via the WORKER_EMAIL_MANAGE procedure:
+--
+--   EXEC WORKER_EMAIL_MANAGE('ADD', 'email@alahlypharos.com', 'Display Name', 4, NULL, :msg);
+--
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- End of patch: Monthly DOB Notifications
