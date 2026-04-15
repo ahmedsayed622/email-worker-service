@@ -10,7 +10,7 @@ function getFirstExport(mod) {
 }
 
 function validateReportConfig(report, fileName) {
-  const required = ['id', 'sql', 'format', 'recipients', 'subject'];
+  const required = ['id', 'sql', 'format', 'subject'];
   const missing = required.filter((key) => report?.[key] === undefined || report?.[key] === null || report?.[key] === '');
   if (missing.length > 0) {
     logger.warn('Report config missing required fields', { fileName, missing });

@@ -29,7 +29,7 @@ export async function validateReportContract(report, triggerRegistry, projectRoo
   const reportId = report?.id || 'UNKNOWN';
 
   // 1. Check required fields
-  const requiredFields = ['id', 'sql', 'format', 'recipients', 'subject', 'triggerType'];
+  const requiredFields = ['id', 'sql', 'format', 'subject', 'triggerType'];
   const missing = requiredFields.filter((field) => !report?.[field]);
 
   if (missing.length > 0) {
