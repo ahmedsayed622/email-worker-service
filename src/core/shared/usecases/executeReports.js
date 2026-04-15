@@ -274,9 +274,14 @@ export function createExecuteReports(ports, config) {
         }
 
         // Execute SQL query
+        // Build params from event context — adapter auto-filters to only what SQL references
+        const sqlParams = { close_date };
+        if (eventContext.month_start_mmdd !== undefined) sqlParams.month_start_mmdd = eventContext.month_start_mmdd;
+        if (eventContext.month_end_mmdd !== undefined) sqlParams.month_end_mmdd = eventContext.month_end_mmdd;
+
         const rows = await ports.reportQueryPort.fetchData(
           report.sql,
-          { close_date },
+          sqlParams,
           { reportId: report.id, domain, triggerType }
         );
 

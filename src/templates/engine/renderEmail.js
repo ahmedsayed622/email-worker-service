@@ -112,7 +112,16 @@ export async function renderEmail({ rule, context, report, defaultFrom }) {
   // 6. Load email template from database-registered path
   const emailTemplate = await loadTemplate(templateInfo.bodyFile);
 
-  // 7. Render email body with context + signature
+  // 7. Derive month name and year from closeDate (for monthly templates)
+  const effectiveLang = rule.languageCode || languageCode;
+  const closeDateStr = String(closeDate);
+  const monthNumFromDate = parseInt(closeDateStr.substring(4, 6), 10);
+  const yearFromDate = closeDateStr.substring(0, 4);
+  const monthNamesEN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNamesAR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  const monthName = (effectiveLang === 'AR' ? monthNamesAR : monthNamesEN)[monthNumFromDate - 1] || '';
+
+  // 8. Render email body with context + signature
   const html = renderTemplate(emailTemplate, {
     reportName,
     closeDate,
@@ -120,6 +129,8 @@ export async function renderEmail({ rule, context, report, defaultFrom }) {
     fileName: fileName ?? '',
     domain,
     reportCode,
+    monthName,
+    year: yearFromDate,
     signatureHtml, // Inject rendered signature (raw)
   });
 

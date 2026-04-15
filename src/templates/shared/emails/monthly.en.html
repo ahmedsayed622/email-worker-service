@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Report</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      color: #1f2a37;
+      direction: ltr;
+      text-align: left;
+    }
+    .container {
+      max-width: 720px;
+      margin: 24px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+    .header {
+      background: #003366;
+      color: #ffffff;
+      padding: 20px 24px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 20px 24px;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 10px 0;
+      font-size: 14px;
+    }
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    .table th {
+      background: #f0f4f8;
+      color: #374151;
+      width: 40%;
+    }
+    .footer {
+      background: #f9fafb;
+      color: #6b7280;
+      padding: 16px 24px;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Monthly Report — {{monthName}} {{year}}</div>
+    <div class="content">
+      <p>Hello,</p>
+      <p>Please find attached the <strong>{{reportName}}</strong> for the month of <strong>{{monthName}} {{year}}</strong>.</p>
+      <table class="table">
+        <tr>
+          <th>Report Name</th>
+          <td>{{reportName}}</td>
+        </tr>
+        <tr>
+          <th>Month</th>
+          <td>{{monthName}} {{year}}</td>
+        </tr>
+        <tr>
+          <th>Total Records</th>
+          <td>{{rowCount}}</td>
+        </tr>
+        <tr>
+          <th>File Name</th>
+          <td>{{fileName}}</td>
+        </tr>
+      </table>
+      <p>Please review the attached file for the full details.</p>
+    </div>
+    <div class="footer">This is an automated message. Please do not reply.</div>
+  </div>
+  {{{signatureHtml}}}
+</body>
+</html>
