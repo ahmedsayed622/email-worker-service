@@ -5,7 +5,6 @@ export const allProfiles = {
   format: 'xlsx',
   sheetName: 'All_Profiles',
   fileName: 'all profiles ({CLOSE_DATE}).xlsx',
-  recipients: ['finance@alahlypharos.com'],
   subject: 'Al Ahly Confirmation All Profiles - {CLOSE_DATE}',
   trigger: 'day-close',
   triggerType: 'FIN_CLOSE',

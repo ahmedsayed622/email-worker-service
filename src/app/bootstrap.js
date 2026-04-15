@@ -135,13 +135,7 @@ export async function bootstrap() {
       hasErrors = true;
     }
 
-    // 2. Recipients check
-    if (!report.recipients || report.recipients.length === 0) {
-      logger.error('Empty recipients', { reportId: report.id });
-      hasErrors = true;
-    }
-
-    // 3. NEW: Report contract validation (triggerType, requiredParams, format)
+    // 2. Report contract validation (triggerType, requiredParams, format)
     try {
       await validateReportContract(report, triggerRegistry, projectRoot);
     } catch (err) {

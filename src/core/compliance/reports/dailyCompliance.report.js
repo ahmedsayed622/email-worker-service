@@ -5,7 +5,6 @@
   format: 'xlsx',
   sheetName: 'Compliance',
   fileName: 'DailyCompliance_{CLOSE_DATE}.xlsx',
-  recipients: ['compliance@alahlypharos.com'],
   subject: 'Daily Compliance Report - {CLOSE_DATE}',
   trigger: 'day-close', // Deprecated: use triggerType
   triggerType: 'CMP_CLOSE', // NEW: Multi-trigger support

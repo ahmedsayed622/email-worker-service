@@ -18,7 +18,6 @@ export const monthlyDobNotifications = {
 
   // Email
   subject: 'Monthly DOB Notifications - {CLOSE_DATE}',
-  recipients: [], // Driven by WORKER_MAIL_RULES
 
   // Behavior
   exportWhenEmpty: true,

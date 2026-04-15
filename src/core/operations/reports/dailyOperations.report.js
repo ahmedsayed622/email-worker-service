@@ -5,7 +5,6 @@
   format: 'xlsx',
   sheetName: 'Operations',
   fileName: 'nbe clients({CLOSE_DATE}).xlsx',
-  recipients: ['operations@alahlypharos.com'],
   subject: 'NBE Clients - {CLOSE_DATE}',
   trigger: 'day-close', // Deprecated: use triggerType
   triggerType: 'OPS_CLOSE', // NEW: Multi-trigger support
