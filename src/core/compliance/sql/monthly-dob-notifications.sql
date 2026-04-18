@@ -1,6 +1,6 @@
 -- Monthly DOB Notifications Report
 -- Domain: compliance
--- TriggerType: MONTH_START
+-- TriggerType: CMP_MONTH_START
 -- Runs on: 1st day of each month (after Oracle Scheduler job at 10:00 AM)
 -- Source: CMP_CLIENTS_TBL_DOB staging table (populated by CMP_CLIENTS_PRO_DOB procedure)
 -- Params: :close_date (YYYYMMDD NUMBER — matches INSERT_DATE in staging table)

@@ -1,5 +1,5 @@
 /**
- * @fileoverview DB adapter for MONTH_START trigger.
+ * @fileoverview DB adapter for CMP_MONTH_START trigger.
  * Reads from CMP_CLIENTS_TBL_CTRL_DOB to detect if the monthly DOB
  * procedure has run for today's date (1st of month, inserted by Oracle Scheduler).
  * Also reads FLAG from CMP_CLIENTS_TBL_DOB to determine data availability.
@@ -8,13 +8,13 @@
  * - FLAG = 1: Real DOB data exists → send DATA email with Excel attachment
  * - FLAG = 0: Procedure ran but no clients found → send NO_DATA email
  *
- * @module adapters/db/triggers/monthStart.adapter
+ * @module adapters/db/triggers/cmpMonthStart.adapter
  */
 
 import oracledb from 'oracledb';
 import logger from '../../../shared/logger/logger.js';
 
-export class MonthStartAdapter {
+export class CmpMonthStartAdapter {
   /**
    * @param {import('oracledb').Pool} pool - Oracle connection pool
    */
@@ -45,7 +45,7 @@ export class MonthStartAdapter {
       );
 
       if (!ctrlResult.rows || ctrlResult.rows.length === 0) {
-        logger.debug('MONTH_START not detected', { today });
+        logger.debug('CMP_MONTH_START not detected', { today });
         return null;
       }
 
@@ -65,10 +65,10 @@ export class MonthStartAdapter {
         ? Number(flagResult.rows[0].FLAG)
         : 1;
 
-      logger.info('MONTH_START detected', { closeDate, flag, today });
+      logger.info('CMP_MONTH_START detected', { closeDate, flag, today });
       return { closeDate, flag };
     } catch (err) {
-      logger.error('MonthStartAdapter.getPendingTrigger failed', { today, error: err.message });
+      logger.error('CmpMonthStartAdapter.getPendingTrigger failed', { today, error: err.message });
       throw err;
     } finally {
       if (conn) await conn.close();

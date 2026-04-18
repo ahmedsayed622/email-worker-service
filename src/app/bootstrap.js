@@ -20,8 +20,8 @@ import * as triggerRegistry from '../core/shared/triggers/triggerRegistry.js';
 import { OpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigger.js';
 import { FinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
 import { CmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
-import { MonthStartTrigger } from '../core/shared/triggers/plugins/monthStart.trigger.js';
-import { MonthStartAdapter } from '../adapters/db/triggers/monthStart.adapter.js';
+import { CmpMonthStartTrigger } from '../core/shared/triggers/plugins/cmpMonthStart.trigger.js';
+import { CmpMonthStartAdapter } from '../adapters/db/triggers/cmpMonthStart.adapter.js';
 import { OpsCloseAdapter } from '../adapters/db/triggers/opsClose.adapter.js';
 import { FinCloseAdapter } from '../adapters/db/triggers/finClose.adapter.js';
 import { CmpCloseAdapter } from '../adapters/db/triggers/cmpClose.adapter.js';
@@ -47,9 +47,9 @@ export async function bootstrap() {
   triggerRegistry.register(new FinCloseTrigger(finCloseAdapter, runStateAdapter));
   triggerRegistry.register(new CmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
 
-  // MONTH_START: polls CMP_CLIENTS_TBL_CTRL_DOB — same pattern as CMP_CLOSE
-  const monthStartAdapter = new MonthStartAdapter(pool);
-  triggerRegistry.register(new MonthStartTrigger(monthStartAdapter, runStateAdapter));
+  // CMP_MONTH_START: polls CMP_CLIENTS_TBL_CTRL_DOB — same pattern as CMP_CLOSE
+  const cmpMonthStartAdapter = new CmpMonthStartAdapter(pool);
+  triggerRegistry.register(new CmpMonthStartTrigger(cmpMonthStartAdapter, runStateAdapter));
 
   logger.info('Triggers registered', {
     count: triggerRegistry.getAll().length,

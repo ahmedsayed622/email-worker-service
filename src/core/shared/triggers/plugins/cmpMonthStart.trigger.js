@@ -1,8 +1,8 @@
 /**
- * @fileoverview MONTH_START Trigger Plugin.
+ * @fileoverview CMP_MONTH_START Trigger Plugin.
  * Polls CMP_CLIENTS_TBL_CTRL_DOB to detect if the monthly DOB procedure
  * has run for today (inserted by Oracle Scheduler on the 1st of each month).
- * Used by reports with triggerType: 'MONTH_START'.
+ * Used by reports with triggerType: 'CMP_MONTH_START'.
  *
  * Follows the same pattern as CMP_CLOSE trigger — DB is the source of truth.
  *
@@ -12,13 +12,13 @@
 import { getTodayAsNumber } from '../getTodayAsNumber.js';
 import logger from '../../../../shared/logger/logger.js';
 
-export class MonthStartTrigger {
+export class CmpMonthStartTrigger {
   /**
-   * @param {import('../../../../adapters/db/triggers/monthStart.adapter.js').MonthStartAdapter} adapter
+   * @param {import('../../../../adapters/db/triggers/cmpMonthStart.adapter.js').CmpMonthStartAdapter} adapter
    * @param {import('../../../../adapters/db/runState.adapter.js')} runStateAdapter
    */
   constructor(adapter, runStateAdapter) {
-    this.type = 'MONTH_START';
+    this.type = 'CMP_MONTH_START';
     this.adapter = adapter;
     this.runState = runStateAdapter;
   }
@@ -58,21 +58,21 @@ export class MonthStartTrigger {
 
   async markReady(triggerId, context = {}) {
     await this.runState.markReady(triggerId, this.type, context);
-    logger.info('MONTH_START marked READY', { triggerId });
+    logger.info('CMP_MONTH_START marked READY', { triggerId });
   }
 
   async markDone(triggerId, execution = {}) {
     await this.runState.markDone(triggerId, this.type, execution);
-    logger.info('MONTH_START marked DONE', { triggerId });
+    logger.info('CMP_MONTH_START marked DONE', { triggerId });
   }
 
   async markPartial(triggerId, execution = {}) {
     await this.runState.markPartial(triggerId, this.type, execution);
-    logger.warn('MONTH_START marked PARTIAL', { triggerId });
+    logger.warn('CMP_MONTH_START marked PARTIAL', { triggerId });
   }
 
   async markFailed(triggerId, errorCode, errorMessage, execution = {}) {
     await this.runState.markFailed(triggerId, this.type, errorCode, errorMessage, execution);
-    logger.error('MONTH_START marked FAILED', { triggerId, errorCode, errorMessage });
+    logger.error('CMP_MONTH_START marked FAILED', { triggerId, errorCode, errorMessage });
   }
 }

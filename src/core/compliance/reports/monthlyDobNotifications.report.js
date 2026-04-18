@@ -8,7 +8,7 @@ export const monthlyDobNotifications = {
   requiredParams: ['close_date'],
 
   // Trigger routing
-  triggerType: 'MONTH_START',
+  triggerType: 'CMP_MONTH_START',
 
   // Output
   format: 'xlsx',
