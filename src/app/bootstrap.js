@@ -21,6 +21,7 @@ import { OpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigge
 import { FinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
 import { CmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
 import { MonthStartTrigger } from '../core/shared/triggers/plugins/monthStart.trigger.js';
+import { MonthStartAdapter } from '../adapters/db/triggers/monthStart.adapter.js';
 import { OpsCloseAdapter } from '../adapters/db/triggers/opsClose.adapter.js';
 import { FinCloseAdapter } from '../adapters/db/triggers/finClose.adapter.js';
 import { CmpCloseAdapter } from '../adapters/db/triggers/cmpClose.adapter.js';
@@ -46,8 +47,9 @@ export async function bootstrap() {
   triggerRegistry.register(new FinCloseTrigger(finCloseAdapter, runStateAdapter));
   triggerRegistry.register(new CmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
 
-  // MONTH_START: No DB adapter needed — fires on 1st day of month via date check
-  triggerRegistry.register(new MonthStartTrigger(runStateAdapter));
+  // MONTH_START: polls CMP_CLIENTS_TBL_CTRL_DOB — same pattern as CMP_CLOSE
+  const monthStartAdapter = new MonthStartAdapter(pool);
+  triggerRegistry.register(new MonthStartTrigger(monthStartAdapter, runStateAdapter));
 
   logger.info('Triggers registered', {
     count: triggerRegistry.getAll().length,

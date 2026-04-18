@@ -1,27 +1,24 @@
 -- Monthly DOB Notifications Report
 -- Domain: compliance
 -- TriggerType: MONTH_START
--- Runs on: 1st day of each month
--- Params: :month_start_mmdd, :month_end_mmdd (MMDD as NUMBER, e.g. 401, 430)
--- Retrieves clients whose date of birth falls within the current month
+-- Runs on: 1st day of each month (after Oracle Scheduler job at 10:00 AM)
+-- Source: CMP_CLIENTS_TBL_DOB staging table (populated by CMP_CLIENTS_PRO_DOB procedure)
+-- Params: :close_date (YYYYMMDD NUMBER — matches INSERT_DATE in staging table)
+-- FLAG=1 rows only — FLAG=0 (no data) is handled before SQL execution
 
-SELECT DISTINCT
-  A.PROFILE_ID,
-  A.CUSTOMER_NAME_EN,
-  A.CUSTOMER_NAME_AR,
-  B.NIN,
-  B.C_ACCOUNT,
-  A.MOBILE_1,
-  A.MOBILE_2,
-  CASE WHEN C.ALL_TO_DATE > 20250403 THEN 'Yes' ELSE 'No' END AS CLIENT_SUSPEND,
-  C.NOTES,
-  A.DOB,
-  EDATA_CAST_DATETIME(A.DOB, 'D,/,M,/,Y') AS DATE_OF_BIRTH
-FROM T_PROFILE_INFO_SETTING A
-INNER JOIN T_INVESTMENT_ACCOUNT_PROFILE B
-  ON A.PROFILE_ID = B.PROFILE_ID
-LEFT JOIN BO_CLIENT_SUSPEND C
-  ON A.PROFILE_ID = C.PROFILE_ID
-WHERE substr(A.DOB, 5, 4) BETWEEN :month_start_mmdd AND :month_end_mmdd
-  AND A.CUSTOMER_CATEGORY = 1
+SELECT
+  PROFILE_ID,
+  CUSTOMER_NAME_EN,
+  CUSTOMER_NAME_AR,
+  NIN,
+  C_ACCOUNT,
+  MOBILE_1,
+  MOBILE_2,
+  CLIENT_SUSPEND,
+  NOTES,
+  DOB,
+  DATE_OF_BIRTH
+FROM back_office.CMP_CLIENTS_TBL_DOB
+WHERE FLAG = 1
+  AND INSERT_DATE = :close_date
 ORDER BY DATE_OF_BIRTH

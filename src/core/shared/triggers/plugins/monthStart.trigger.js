@@ -1,74 +1,55 @@
 /**
  * @fileoverview MONTH_START Trigger Plugin.
- * Fires on the 1st day of each month — no DB polling required.
- * Computes month_start_mmdd and month_end_mmdd for SQL bind params.
+ * Polls CMP_CLIENTS_TBL_CTRL_DOB to detect if the monthly DOB procedure
+ * has run for today (inserted by Oracle Scheduler on the 1st of each month).
  * Used by reports with triggerType: 'MONTH_START'.
+ *
+ * Follows the same pattern as CMP_CLOSE trigger — DB is the source of truth.
  *
  * @implements {TriggerPlugin}
  */
 
+import { getTodayAsNumber } from '../getTodayAsNumber.js';
 import logger from '../../../../shared/logger/logger.js';
 
 export class MonthStartTrigger {
   /**
+   * @param {import('../../../../adapters/db/triggers/monthStart.adapter.js').MonthStartAdapter} adapter
    * @param {import('../../../../adapters/db/runState.adapter.js')} runStateAdapter
    */
-  constructor(runStateAdapter) {
+  constructor(adapter, runStateAdapter) {
     this.type = 'MONTH_START';
+    this.adapter = adapter;
     this.runState = runStateAdapter;
   }
 
   /**
-   * Poll — fires only on the 1st day of the month.
-   * No DB query needed; decision is purely date-based.
+   * Poll for pending monthly trigger.
    * @returns {Promise<TriggerEvent[]>}
    */
   async poll() {
-    const today = new Date();
+    const today = getTodayAsNumber();
+    const result = await this.adapter.getPendingTrigger(today);
 
-    if (today.getDate() !== 1) return [];
+    if (!result) return [];
 
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1; // 1-12
-    const lastDay = new Date(year, month, 0).getDate(); // 28 / 29 / 30 / 31
-
-    // close_date = first day of month as YYYYMMDD NUMBER (e.g. 20260401)
-    const close_date = year * 10000 + month * 100 + 1;
-
-    // triggerId = YYYYMM — prevents duplicate runs in the same month
-    const triggerId = `${year}${String(month).padStart(2, '0')}`;
-
-    // MMDD as NUMBER — e.g. April → 401 .. 430
-    const month_start_mmdd = month * 100 + 1;
-    const month_end_mmdd = month * 100 + lastDay;
-
-    logger.info('MONTH_START detected', {
-      triggerId,
-      close_date,
-      month,
-      year,
-      lastDay,
-      month_start_mmdd,
-      month_end_mmdd,
-    });
+    const { closeDate, flag } = result;
+    const triggerId = String(closeDate).slice(0, 6); // YYYYMM
 
     return [{
       triggerType: this.type,
       triggerId,
-      close_date,
-      month_start_mmdd,
-      month_end_mmdd,
+      close_date: closeDate,
+      flag,
       meta: {
-        source: 'date_check',
-        year,
-        month,
-        lastDay,
+        source: 'CMP_CLIENTS_TBL_CTRL_DOB',
+        hasRealData: flag === 1,
       },
     }];
   }
 
   /**
-   * Attempt to claim the event (prevents re-processing same month).
+   * Attempt to claim the event for processing.
    * @param {string} triggerId - YYYYMM format
    */
   async claim(triggerId) {
