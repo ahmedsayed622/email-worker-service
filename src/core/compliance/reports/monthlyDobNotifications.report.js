@@ -3,12 +3,12 @@ export const monthlyDobNotifications = {
   id: 'cmp-monthly-dob',
   name: 'Monthly DOB Notifications',
 
-  // Data source
+  // Data source — reads from staging table populated by CMP_CLIENTS_PRO_DOB procedure
   sql: 'core/compliance/sql/monthly-dob-notifications.sql',
-  requiredParams: ['month_start_mmdd', 'month_end_mmdd'],
+  requiredParams: ['close_date'],
 
   // Trigger routing
-  triggerType: 'MONTH_START',
+  triggerType: 'CMP_MONTH_START',
 
   // Output
   format: 'xlsx',
@@ -19,7 +19,5 @@ export const monthlyDobNotifications = {
   // Email
   subject: 'Monthly DOB Notifications - {CLOSE_DATE}',
 
-  // Behavior
-  exportWhenEmpty: true,
   enabled: true,
 };

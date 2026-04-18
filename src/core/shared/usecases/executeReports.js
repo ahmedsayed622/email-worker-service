@@ -197,9 +197,9 @@ export function createExecuteReports(ports, config) {
           usedCustomPath: !!report.customPath,
         });
 
-        // Check if FLAG=0 for CMP_CLOSE trigger (no real data, skip SQL execution)
-        if (eventContext.flag === 0 && triggerType === 'CMP_CLOSE') {
-          logger.info('CMP_CLOSE FLAG=0 detected - skipping SQL, sending NO_DATA email', {
+        // Check if FLAG=0 (no real data) — skip SQL, send NO_DATA email directly
+        if (eventContext.flag === 0) {
+          logger.info('FLAG=0 detected - skipping SQL, sending NO_DATA email', {
             reportId: report.id,
             domain,
             close_date,
@@ -265,7 +265,7 @@ export function createExecuteReports(ports, config) {
             rowCount: 0,
             filePath: null,
             attemptNo,
-            reason: 'FLAG=0 (no real data)',
+            reason: `FLAG=0 — no real data (${triggerType})`,
           });
 
           doneCount++;
