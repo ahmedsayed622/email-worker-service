@@ -37,7 +37,7 @@ export class CmpMonthStartAdapter {
       // Step 1: Check if procedure ran today (control record exists)
       const ctrlResult = await conn.execute(
         `SELECT MONTHLY_DATE
-         FROM back_office.CMP_CLIENTS_TBL_CTRL_DOB
+         FROM CMP_CLIENTS_TBL_CTRL_DOB
          WHERE MONTHLY_DATE = :today
          AND ROWNUM = 1`,
         { today: Number(today) },
@@ -54,7 +54,7 @@ export class CmpMonthStartAdapter {
       // Step 2: Read FLAG from DOB staging table
       const flagResult = await conn.execute(
         `SELECT FLAG
-         FROM back_office.CMP_CLIENTS_TBL_DOB
+         FROM CMP_CLIENTS_TBL_DOB
          WHERE INSERT_DATE = :today
          AND ROWNUM = 1`,
         { today: Number(today) },
