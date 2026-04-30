@@ -7,28 +7,27 @@
 
 import logger from '../../../shared/logger/logger.js';
 
-export class FinCloseAdapter {
-  /**
-   * @param {import('oracledb').Pool} pool - Oracle connection pool
-   */
-  constructor(pool) {
-    this.pool = pool;
-  }
-
+/**
+ * Create the Finance day-close trigger adapter.
+ *
+ * @param {import('oracledb').Pool} pool - Oracle connection pool
+ * @returns {{ getCloseDateIfClosed: (today: number) => Promise<number|null> }}
+ */
+export function createFinCloseAdapter(pool) {
   /**
    * Check if finance day-close has occurred for a given date.
    * Returns the close_date as NUMBER (YYYYMMDD) if closed, or null if not.
-   * 
+   *
    * Note: END_OF_DAY_DATE column is NUMBER(8,0) in YYYYMMDD format.
    * Compatible with Oracle 11g (uses ROWNUM instead of FETCH FIRST).
    *
    * @param {number} today - Today's date as YYYYMMDD number (e.g., 20260219)
    * @returns {Promise<number|null>} close_date or null
    */
-  async getCloseDateIfClosed(today) {
+  async function getCloseDateIfClosed(today) {
     let conn;
     try {
-      conn = await this.pool.getConnection();
+      conn = await pool.getConnection();
 
       // Simple direct query - END_OF_DAY_DATE is already NUMBER(8,0) in YYYYMMDD format
       // Using ROWNUM for Oracle 11g compatibility (FETCH FIRST is 12c+)
@@ -50,10 +49,12 @@ export class FinCloseAdapter {
       logger.debug('FIN_CLOSE not detected', { today });
       return null;
     } catch (err) {
-      logger.error('FinCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
+      logger.error('finCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
       throw err;
     } finally {
       if (conn) await conn.close();
     }
   }
+
+  return { getCloseDateIfClosed };
 }

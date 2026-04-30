@@ -10,14 +10,13 @@
 
 import logger from '../../../shared/logger/logger.js';
 
-export class CmpCloseAdapter {
-  /**
-   * @param {import('oracledb').Pool} pool - Oracle connection pool
-   */
-  constructor(pool) {
-    this.pool = pool;
-  }
-
+/**
+ * Create the Compliance trigger adapter.
+ *
+ * @param {import('oracledb').Pool} pool - Oracle connection pool
+ * @returns {{ getCloseDateIfClosed: (today: number) => Promise<{closeDate: number, flag: number}|null> }}
+ */
+export function createCmpCloseAdapter(pool) {
   /**
    * Check if compliance data exists for a given date.
    * Returns an object with closeDate and flag if data exists, or null if not.
@@ -29,10 +28,10 @@ export class CmpCloseAdapter {
    * @param {number} today - Today's date as YYYYMMDD number
    * @returns {Promise<{closeDate: number, flag: number}|null>} Object with closeDate and flag, or null
    */
-  async getCloseDateIfClosed(today) {
+  async function getCloseDateIfClosed(today) {
     let conn;
     try {
-      conn = await this.pool.getConnection();
+      conn = await pool.getConnection();
 
       const result = await conn.execute(
         `SELECT INVOICE_DATE AS CLOSE_DATE, FLAG
@@ -53,10 +52,12 @@ export class CmpCloseAdapter {
       logger.debug('CMP_CLOSE not detected', { today });
       return null;
     } catch (err) {
-      logger.error('CmpCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
+      logger.error('cmpCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
       throw err;
     } finally {
       if (conn) await conn.close();
     }
   }
+
+  return { getCloseDateIfClosed };
 }

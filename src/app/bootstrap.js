@@ -7,6 +7,8 @@ import { initPool, closePool } from '../adapters/db/oraclePool.js';
 import { createRunStateAdapter } from '../adapters/db/runState.adapter.js';
 import { createReportQueryAdapter } from '../adapters/db/reportQuery.adapter.js';
 import { createMailRulesAdapter } from '../adapters/db/mailRules.adapter.js';
+import { createTemplateRegistryAdapter } from '../adapters/db/templateRegistry.adapter.js';
+import { createSignatureRegistryAdapter } from '../adapters/db/signatureRegistry.adapter.js';
 import { createAuditAdapter } from '../adapters/db/audit.adapter.js';
 import { createExportAdapter } from '../adapters/export/index.js';
 import { createSmtpAdapter } from '../adapters/email/smtp.adapter.js';
@@ -17,14 +19,14 @@ import { createExecuteReports } from '../core/shared/usecases/executeReports.js'
 
 // NEW: Trigger system imports
 import * as triggerRegistry from '../core/shared/triggers/triggerRegistry.js';
-import { OpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigger.js';
-import { FinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
-import { CmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
-import { CmpMonthStartTrigger } from '../core/shared/triggers/plugins/cmpMonthStart.trigger.js';
-import { CmpMonthStartAdapter } from '../adapters/db/triggers/cmpMonthStart.adapter.js';
-import { OpsCloseAdapter } from '../adapters/db/triggers/opsClose.adapter.js';
-import { FinCloseAdapter } from '../adapters/db/triggers/finClose.adapter.js';
-import { CmpCloseAdapter } from '../adapters/db/triggers/cmpClose.adapter.js';
+import { createOpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigger.js';
+import { createFinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
+import { createCmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
+import { createCmpMonthStartTrigger } from '../core/shared/triggers/plugins/cmpMonthStart.trigger.js';
+import { createCmpMonthStartAdapter } from '../adapters/db/triggers/cmpMonthStart.adapter.js';
+import { createOpsCloseAdapter } from '../adapters/db/triggers/opsClose.adapter.js';
+import { createFinCloseAdapter } from '../adapters/db/triggers/finClose.adapter.js';
+import { createCmpCloseAdapter } from '../adapters/db/triggers/cmpClose.adapter.js';
 
 // NEW: Validation imports
 import { validateReportContract } from '../core/shared/validation/validateReportContract.js';
@@ -38,18 +40,18 @@ export async function bootstrap() {
   const runStateAdapter = createRunStateAdapter(env.MAX_RETRY_ATTEMPTS);
 
   // NEW: Create trigger DB adapters
-  const opsCloseAdapter = new OpsCloseAdapter(pool);
-  const finCloseAdapter = new FinCloseAdapter(pool);
-  const cmpCloseAdapter = new CmpCloseAdapter(pool);
+  const opsCloseAdapter = createOpsCloseAdapter(pool);
+  const finCloseAdapter = createFinCloseAdapter(pool);
+  const cmpCloseAdapter = createCmpCloseAdapter(pool);
 
   // NEW: Create and register trigger plugins
-  triggerRegistry.register(new OpsCloseTrigger(opsCloseAdapter, runStateAdapter));
-  triggerRegistry.register(new FinCloseTrigger(finCloseAdapter, runStateAdapter));
-  triggerRegistry.register(new CmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createOpsCloseTrigger(opsCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createFinCloseTrigger(finCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createCmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
 
   // CMP_MONTH_START: polls CMP_CLIENTS_TBL_CTRL_DOB — same pattern as CMP_CLOSE
-  const cmpMonthStartAdapter = new CmpMonthStartAdapter(pool);
-  triggerRegistry.register(new CmpMonthStartTrigger(cmpMonthStartAdapter, runStateAdapter));
+  const cmpMonthStartAdapter = createCmpMonthStartAdapter(pool);
+  triggerRegistry.register(createCmpMonthStartTrigger(cmpMonthStartAdapter, runStateAdapter));
 
   logger.info('Triggers registered', {
     count: triggerRegistry.getAll().length,
@@ -59,6 +61,8 @@ export async function bootstrap() {
   // Create other ports
   const reportQueryPort = createReportQueryAdapter();
   const mailRulesPort = createMailRulesAdapter();
+  const templateRegistryPort = createTemplateRegistryAdapter();
+  const signatureRegistryPort = createSignatureRegistryAdapter();
   const auditPort = createAuditAdapter();
   const exportPort = createExportAdapter();
   const fileStorePort = createFileStoreAdapter(env.REPORTS_OUTPUT_DIR);
@@ -158,7 +162,7 @@ export async function bootstrap() {
 
   // NEW: Create generic executeReports (replaces executeDayClose)
   const executeReports = createExecuteReports(
-    { reportQueryPort, exportPort, emailPort, auditPort, runStatePort: runStateAdapter, fileStorePort, mailRulesPort },
+    { reportQueryPort, exportPort, emailPort, auditPort, runStatePort: runStateAdapter, fileStorePort, mailRulesPort, templateRegistryPort, signatureRegistryPort },
     {
       maxRetryAttempts: env.MAX_RETRY_ATTEMPTS,
       adminEmail: env.ADMIN_EMAIL,

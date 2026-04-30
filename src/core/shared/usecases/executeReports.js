@@ -84,6 +84,8 @@ function buildAdminNotificationBody(eventContext, failedList, summary) {
  * @param {Object} ports.emailPort - Email sending port
  * @param {Object} ports.auditPort - Audit logging port
  * @param {Object} ports.fileStorePort - Filesystem operations port
+ * @param {Object} ports.templateRegistryPort - Template registry port (for email rendering)
+ * @param {Object} ports.signatureRegistryPort - Signature registry port (for email rendering)
  * @param {Object} config - Configuration
  * @param {number} config.maxRetryAttempts - Maximum retry attempts
  * @param {string} config.reportsOutputDir - Default reports output directory
@@ -245,6 +247,8 @@ export function createExecuteReports(ports, config) {
               context: emailContext,
               report,
               defaultFrom: config.emailFrom,
+              templateRegistry: ports.templateRegistryPort,
+              signatureRegistry: ports.signatureRegistryPort,
             });
 
             logger.info('Resolved recipients from mail rules', { reportId: report.id, eventType: 'NO_DATA', to: recipients });
@@ -325,6 +329,8 @@ export function createExecuteReports(ports, config) {
               context: emailContext,
               report,
               defaultFrom: config.emailFrom,
+              templateRegistry: ports.templateRegistryPort,
+              signatureRegistry: ports.signatureRegistryPort,
             });
 
             logger.info('Resolved recipients from mail rules', { reportId: report.id, eventType: 'NO_DATA', to: recipients });
@@ -439,6 +445,8 @@ export function createExecuteReports(ports, config) {
           context: emailContext,
           report,
           defaultFrom: config.emailFrom,
+          templateRegistry: ports.templateRegistryPort,
+          signatureRegistry: ports.signatureRegistryPort,
         });
 
         logger.info('Resolved recipients from mail rules', { reportId: report.id, eventType: 'DATA', to: recipients });
