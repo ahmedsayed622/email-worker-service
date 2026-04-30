@@ -3,8 +3,11 @@ import logger from '../../shared/logger/logger.js';
 import { normalizeError } from '../../shared/errors/normalizeError.js';
 
 /**
- * Adapter for WORKER_MAIL_TEMPLATE_REGISTRY table
- * Retrieves email template metadata (file paths, direction) from database
+ * Adapter for WORKER_MAIL_TEMPLATE_REGISTRY table.
+ * Retrieves email template metadata (file paths, direction) from database.
+ * Implements TemplateRegistryPort.
+ *
+ * @returns {import('../../core/shared/ports/TemplateRegistryPort.js').TemplateRegistryPort}
  */
 export function createTemplateRegistryAdapter() {
   return {

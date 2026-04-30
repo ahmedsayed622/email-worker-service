@@ -2,6 +2,12 @@ import oracledb from 'oracledb';
 import logger from '../../shared/logger/logger.js';
 import { normalizeError } from '../../shared/errors/normalizeError.js';
 
+/**
+ * Adapter for WORKER_MAIL_RULES + WORKER_MAIL_RECIPIENTS_V.
+ * Implements MailRulesPort.
+ *
+ * @returns {import('../../core/shared/ports/MailRulesPort.js').MailRulesPort}
+ */
 export function createMailRulesAdapter() {
   return {
     async getRule({ domain, reportCode, eventType, languageCode = 'EN' }) {

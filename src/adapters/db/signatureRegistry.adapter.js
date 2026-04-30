@@ -3,8 +3,11 @@ import logger from '../../shared/logger/logger.js';
 import { normalizeError } from '../../shared/errors/normalizeError.js';
 
 /**
- * Adapter for WORKER_MAIL_SIGNATURE_REGISTRY table
- * Retrieves signature file paths from database
+ * Adapter for WORKER_MAIL_SIGNATURE_REGISTRY table.
+ * Retrieves signature file paths from database.
+ * Implements SignatureRegistryPort.
+ *
+ * @returns {import('../../core/shared/ports/SignatureRegistryPort.js').SignatureRegistryPort}
  */
 export function createSignatureRegistryAdapter() {
   return {
