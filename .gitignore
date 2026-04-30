@@ -4,7 +4,8 @@
 .env.production
 data/reports/
 logs/
-export/
+/export/
+/data/export/
 *.log
 .DS_Store
 
