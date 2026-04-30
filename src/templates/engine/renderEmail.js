@@ -4,12 +4,10 @@ import { loadTemplate } from './loadTemplate.js';
 import { renderTemplate } from './renderTemplate.js';
 import { loadSignatureWithInlineImages } from '../../core/shared/domain/emailTemplates/signatures/signatureLoader.js';
 import { resolveSubject } from '../../core/shared/domain/reportNaming.js';
-import { createTemplateRegistryAdapter } from '../../adapters/db/templateRegistry.adapter.js';
-import { createSignatureRegistryAdapter } from '../../adapters/db/signatureRegistry.adapter.js';
 
 /**
  * Render complete email (subject, from, html body) using database-driven templates
- * 
+ *
  * @param {Object} options
  * @param {Object} options.rule - Mail rule from WORKER_MAIL_RULES
  * @param {string} options.rule.fromAddress - From email address (nullable)
@@ -28,11 +26,14 @@ import { createSignatureRegistryAdapter } from '../../adapters/db/signatureRegis
  * @param {string} [options.context.fileName] - File name (for DATA emails)
  * @param {Object} options.report - Report definition (for fallback subject)
  * @param {string} [options.defaultFrom] - Default from address if rule doesn't specify
+ * @param {import('../../core/shared/ports/TemplateRegistryPort.js').TemplateRegistryPort} options.templateRegistry - Template registry port (injected)
+ * @param {import('../../core/shared/ports/SignatureRegistryPort.js').SignatureRegistryPort} options.signatureRegistry - Signature registry port (injected)
  * @returns {Promise<Object>} { from: string, subject: string, html: string }
  */
-export async function renderEmail({ rule, context, report, defaultFrom }) {
-  const templateRegistry = createTemplateRegistryAdapter();
-  const signatureRegistry = createSignatureRegistryAdapter();
+export async function renderEmail({ rule, context, report, defaultFrom, templateRegistry, signatureRegistry }) {
+  if (!templateRegistry || !signatureRegistry) {
+    throw new Error('renderEmail: templateRegistry and signatureRegistry are required (DI)');
+  }
 
   const {
     domain,

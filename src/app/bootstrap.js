@@ -7,6 +7,8 @@ import { initPool, closePool } from '../adapters/db/oraclePool.js';
 import { createRunStateAdapter } from '../adapters/db/runState.adapter.js';
 import { createReportQueryAdapter } from '../adapters/db/reportQuery.adapter.js';
 import { createMailRulesAdapter } from '../adapters/db/mailRules.adapter.js';
+import { createTemplateRegistryAdapter } from '../adapters/db/templateRegistry.adapter.js';
+import { createSignatureRegistryAdapter } from '../adapters/db/signatureRegistry.adapter.js';
 import { createAuditAdapter } from '../adapters/db/audit.adapter.js';
 import { createExportAdapter } from '../adapters/export/index.js';
 import { createSmtpAdapter } from '../adapters/email/smtp.adapter.js';
@@ -59,6 +61,8 @@ export async function bootstrap() {
   // Create other ports
   const reportQueryPort = createReportQueryAdapter();
   const mailRulesPort = createMailRulesAdapter();
+  const templateRegistryPort = createTemplateRegistryAdapter();
+  const signatureRegistryPort = createSignatureRegistryAdapter();
   const auditPort = createAuditAdapter();
   const exportPort = createExportAdapter();
   const fileStorePort = createFileStoreAdapter(env.REPORTS_OUTPUT_DIR);
@@ -158,7 +162,7 @@ export async function bootstrap() {
 
   // NEW: Create generic executeReports (replaces executeDayClose)
   const executeReports = createExecuteReports(
-    { reportQueryPort, exportPort, emailPort, auditPort, runStatePort: runStateAdapter, fileStorePort, mailRulesPort },
+    { reportQueryPort, exportPort, emailPort, auditPort, runStatePort: runStateAdapter, fileStorePort, mailRulesPort, templateRegistryPort, signatureRegistryPort },
     {
       maxRetryAttempts: env.MAX_RETRY_ATTEMPTS,
       adminEmail: env.ADMIN_EMAIL,
