@@ -51,21 +51,23 @@ export class CmpMonthStartAdapter {
 
       const closeDate = Number(ctrlResult.rows[0].MONTHLY_DATE);
 
-      // Step 2: Read FLAG from DOB staging table
-      const flagResult = await conn.execute(
-        `SELECT FLAG
+      // Step 2: Count real DOB rows (FLAG=1) for today.
+      // Procedure invariant: a given INSERT_DATE has either N rows with FLAG=1
+      // (real data) or exactly 1 placeholder row with FLAG=0 (no data).
+      // So COUNT(FLAG=1) > 0 ⇒ DATA, COUNT(FLAG=1) = 0 ⇒ NO_DATA.
+      const countResult = await conn.execute(
+        `SELECT COUNT(*) AS CNT
          FROM back_office.CMP_CLIENTS_TBL_DOB
          WHERE INSERT_DATE = :today
-         AND ROWNUM = 1`,
+         AND FLAG = 1`,
         { today: Number(today) },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
 
-      const flag = flagResult.rows && flagResult.rows.length > 0
-        ? Number(flagResult.rows[0].FLAG)
-        : 1;
+      const dataCount = Number(countResult.rows[0].CNT);
+      const flag = dataCount > 0 ? 1 : 0;
 
-      logger.info('CMP_MONTH_START detected', { closeDate, flag, today });
+      logger.info('CMP_MONTH_START detected', { closeDate, flag, dataCount, today });
       return { closeDate, flag };
     } catch (err) {
       logger.error('CmpMonthStartAdapter.getPendingTrigger failed', { today, error: err.message });
