@@ -19,10 +19,10 @@ import { createExecuteReports } from '../core/shared/usecases/executeReports.js'
 
 // NEW: Trigger system imports
 import * as triggerRegistry from '../core/shared/triggers/triggerRegistry.js';
-import { OpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigger.js';
-import { FinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
-import { CmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
-import { CmpMonthStartTrigger } from '../core/shared/triggers/plugins/cmpMonthStart.trigger.js';
+import { createOpsCloseTrigger } from '../core/shared/triggers/plugins/opsClose.trigger.js';
+import { createFinCloseTrigger } from '../core/shared/triggers/plugins/finClose.trigger.js';
+import { createCmpCloseTrigger } from '../core/shared/triggers/plugins/cmpClose.trigger.js';
+import { createCmpMonthStartTrigger } from '../core/shared/triggers/plugins/cmpMonthStart.trigger.js';
 import { createCmpMonthStartAdapter } from '../adapters/db/triggers/cmpMonthStart.adapter.js';
 import { createOpsCloseAdapter } from '../adapters/db/triggers/opsClose.adapter.js';
 import { createFinCloseAdapter } from '../adapters/db/triggers/finClose.adapter.js';
@@ -45,13 +45,13 @@ export async function bootstrap() {
   const cmpCloseAdapter = createCmpCloseAdapter(pool);
 
   // NEW: Create and register trigger plugins
-  triggerRegistry.register(new OpsCloseTrigger(opsCloseAdapter, runStateAdapter));
-  triggerRegistry.register(new FinCloseTrigger(finCloseAdapter, runStateAdapter));
-  triggerRegistry.register(new CmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createOpsCloseTrigger(opsCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createFinCloseTrigger(finCloseAdapter, runStateAdapter));
+  triggerRegistry.register(createCmpCloseTrigger(cmpCloseAdapter, runStateAdapter));
 
   // CMP_MONTH_START: polls CMP_CLIENTS_TBL_CTRL_DOB — same pattern as CMP_CLOSE
   const cmpMonthStartAdapter = createCmpMonthStartAdapter(pool);
-  triggerRegistry.register(new CmpMonthStartTrigger(cmpMonthStartAdapter, runStateAdapter));
+  triggerRegistry.register(createCmpMonthStartTrigger(cmpMonthStartAdapter, runStateAdapter));
 
   logger.info('Triggers registered', {
     count: triggerRegistry.getAll().length,
