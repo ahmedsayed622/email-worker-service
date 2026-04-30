@@ -7,14 +7,13 @@
 
 import logger from '../../../shared/logger/logger.js';
 
-export class OpsCloseAdapter {
-  /**
-   * @param {import('oracledb').Pool} pool - Oracle connection pool
-   */
-  constructor(pool) {
-    this.pool = pool;
-  }
-
+/**
+ * Create the Operations day-close trigger adapter.
+ *
+ * @param {import('oracledb').Pool} pool - Oracle connection pool
+ * @returns {{ getCloseDateIfClosed: (today: number) => Promise<number|null> }}
+ */
+export function createOpsCloseAdapter(pool) {
   /**
    * Check if operations day-close has occurred for a given date.
    * Returns the close_date as NUMBER (YYYYMMDD) if closed, or null if not.
@@ -22,10 +21,10 @@ export class OpsCloseAdapter {
    * @param {number} today - Today's date as YYYYMMDD number
    * @returns {Promise<number|null>} close_date or null
    */
-  async getCloseDateIfClosed(today) {
+  async function getCloseDateIfClosed(today) {
     let conn;
     try {
-      conn = await this.pool.getConnection();
+      conn = await pool.getConnection();
       const result = await conn.execute(
         `SELECT END_OF_DAY_DATE
          FROM back_office.BO_END_OF_DAY
@@ -43,10 +42,12 @@ export class OpsCloseAdapter {
 
       return null;
     } catch (err) {
-      logger.error('OpsCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
+      logger.error('opsCloseAdapter.getCloseDateIfClosed failed', { today, error: err.message });
       throw err;
     } finally {
       if (conn) await conn.close();
     }
   }
+
+  return { getCloseDateIfClosed };
 }

@@ -14,14 +14,13 @@
 import oracledb from 'oracledb';
 import logger from '../../../shared/logger/logger.js';
 
-export class CmpMonthStartAdapter {
-  /**
-   * @param {import('oracledb').Pool} pool - Oracle connection pool
-   */
-  constructor(pool) {
-    this.pool = pool;
-  }
-
+/**
+ * Create the CMP_MONTH_START trigger adapter.
+ *
+ * @param {import('oracledb').Pool} pool - Oracle connection pool
+ * @returns {{ getPendingTrigger: (today: number) => Promise<{closeDate: number, flag: number}|null> }}
+ */
+export function createCmpMonthStartAdapter(pool) {
   /**
    * Check if the monthly DOB procedure has run for today.
    * Returns closeDate and flag if the control record exists, null otherwise.
@@ -29,10 +28,10 @@ export class CmpMonthStartAdapter {
    * @param {number} today - Today's date as YYYYMMDD number
    * @returns {Promise<{closeDate: number, flag: number}|null>}
    */
-  async getPendingTrigger(today) {
+  async function getPendingTrigger(today) {
     let conn;
     try {
-      conn = await this.pool.getConnection();
+      conn = await pool.getConnection();
 
       // Step 1: Check if procedure ran today (control record exists)
       const ctrlResult = await conn.execute(
@@ -70,10 +69,12 @@ export class CmpMonthStartAdapter {
       logger.info('CMP_MONTH_START detected', { closeDate, flag, dataCount, today });
       return { closeDate, flag };
     } catch (err) {
-      logger.error('CmpMonthStartAdapter.getPendingTrigger failed', { today, error: err.message });
+      logger.error('cmpMonthStartAdapter.getPendingTrigger failed', { today, error: err.message });
       throw err;
     } finally {
       if (conn) await conn.close();
     }
   }
+
+  return { getPendingTrigger };
 }
