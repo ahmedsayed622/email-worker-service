@@ -11,14 +11,14 @@ import logger from '../../../shared/logger/logger.js';
 
 /**
  * Internal registry (Map: triggerType → TriggerPlugin)
- * @type {Map<string, import('./TriggerPlugin.interface.js').TriggerPlugin>}
+ * @type {Map<string, import('../ports/TriggerPlugin.interface.js').TriggerPlugin>}
  */
 const registry = new Map();
 
 /**
  * Register a trigger plugin
  * 
- * @param {import('./TriggerPlugin.interface.js').TriggerPlugin} plugin
+ * @param {import('../ports/TriggerPlugin.interface.js').TriggerPlugin} plugin
  * @throws {Error} If trigger type already registered
  */
 export function register(plugin) {
@@ -37,7 +37,7 @@ export function register(plugin) {
 /**
  * Get all registered triggers
  * 
- * @returns {import('./TriggerPlugin.interface.js').TriggerPlugin[]} Array of all trigger plugins
+ * @returns {import('../ports/TriggerPlugin.interface.js').TriggerPlugin[]} Array of all trigger plugins
  */
 export function getAll() {
   return Array.from(registry.values());
@@ -47,7 +47,7 @@ export function getAll() {
  * Get a specific trigger by type
  * 
  * @param {string} type - Trigger type identifier
- * @returns {import('./TriggerPlugin.interface.js').TriggerPlugin|undefined} The trigger plugin or undefined
+ * @returns {import('../ports/TriggerPlugin.interface.js').TriggerPlugin|undefined} The trigger plugin or undefined
  */
 export function get(type) {
   return registry.get(type);

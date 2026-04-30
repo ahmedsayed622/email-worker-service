@@ -15,7 +15,7 @@ import logger from '../../../../shared/logger/logger.js';
 /**
  * @param {{ getCloseDateIfClosed: (today: number) => Promise<{closeDate: number, flag: number}|null> }} adapter
  * @param {import('../../../../adapters/db/runState.adapter.js')} runStateAdapter
- * @returns {import('../TriggerPlugin.interface.js').TriggerPlugin}
+ * @returns {import('../../ports/TriggerPlugin.interface.js').TriggerPlugin}
  */
 export function createCmpCloseTrigger(adapter, runStateAdapter) {
   const type = 'CMP_CLOSE';

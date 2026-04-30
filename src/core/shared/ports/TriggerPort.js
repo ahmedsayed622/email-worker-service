@@ -14,10 +14,10 @@
  * 
  * @typedef {Object} TriggerPort
  * 
- * @property {() => Promise<import('../triggers/TriggerPlugin.interface.js').TriggerEvent[]>} poll
+ * @property {() => Promise<import('./TriggerPlugin.interface.js').TriggerEvent[]>} poll
  *   - Poll for ready events from the trigger source
  * 
- * @property {(triggerId: string) => Promise<import('../triggers/TriggerPlugin.interface.js').ClaimResult>} claim
+ * @property {(triggerId: string) => Promise<import('./TriggerPlugin.interface.js').ClaimResult>} claim
  *   - Claim an event for processing
  * 
  * @property {(triggerId: string) => Promise<void>} markDone

@@ -12,7 +12,7 @@ import logger from '../../../../shared/logger/logger.js';
 /**
  * @param {{ getCloseDateIfClosed: (today: number) => Promise<number|null> }} adapter
  * @param {import('../../../../adapters/db/runState.adapter.js')} runStateAdapter
- * @returns {import('../TriggerPlugin.interface.js').TriggerPlugin}
+ * @returns {import('../../ports/TriggerPlugin.interface.js').TriggerPlugin}
  */
 export function createFinCloseTrigger(adapter, runStateAdapter) {
   const type = 'FIN_CLOSE';
