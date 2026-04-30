@@ -1,0 +1,54 @@
+-- ============================================================
+-- Validation Queries — run after applying all seed files.
+-- These are SELECTs only, no DML.
+-- ============================================================
+
+-- All addresses
+SELECT * FROM WORKER_MAIL_ADDRESS ORDER BY ADDRESS_ID;
+
+-- All groups
+SELECT * FROM WORKER_MAIL_GROUP ORDER BY GROUP_ID;
+
+-- Group members (who is in which group)
+SELECT 
+  g.GROUP_NAME,
+  a.ADDRESS,
+  a.DISPLAY_NAME
+FROM WORKER_MAIL_GROUP g
+JOIN WORKER_MAIL_GROUP_MEMBER gm ON g.GROUP_ID = gm.GROUP_ID
+JOIN WORKER_MAIL_ADDRESS a       ON gm.ADDRESS_ID = a.ADDRESS_ID
+WHERE gm.IS_ACTIVE = 'Y' AND a.IS_ACTIVE = 'Y'
+ORDER BY g.GROUP_ID;
+
+-- All rules
+SELECT 
+  RULE_ID,
+  DOMAIN,
+  REPORT_CODE,
+  EVENT_TYPE,
+  LANGUAGE_CODE,
+  TEMPLATE_KEY,
+  FROM_ADDRESS
+FROM WORKER_MAIL_RULES
+ORDER BY DOMAIN, REPORT_CODE, EVENT_TYPE, LANGUAGE_CODE;
+
+-- Full email routing (rule → group → recipient)
+SELECT 
+  r.RULE_ID,
+  r.DOMAIN,
+  r.REPORT_CODE,
+  r.EVENT_TYPE,
+  r.LANGUAGE_CODE,
+  g.GROUP_NAME,
+  a.ADDRESS AS RECIPIENT_EMAIL
+FROM WORKER_MAIL_RULES r
+JOIN WORKER_MAIL_RULE_TARGET rt ON r.RULE_ID = rt.RULE_ID
+JOIN WORKER_MAIL_GROUP g        ON rt.GROUP_ID = g.GROUP_ID
+JOIN WORKER_MAIL_GROUP_MEMBER gm ON g.GROUP_ID = gm.GROUP_ID
+JOIN WORKER_MAIL_ADDRESS a       ON gm.ADDRESS_ID = a.ADDRESS_ID
+WHERE r.IS_ACTIVE = 'Y' 
+  AND r.NOTIFY_ENABLED = 'Y'
+  AND rt.IS_ACTIVE = 'Y'
+  AND gm.IS_ACTIVE = 'Y'
+  AND a.IS_ACTIVE = 'Y'
+ORDER BY r.DOMAIN, r.REPORT_CODE, r.EVENT_TYPE, r.LANGUAGE_CODE;

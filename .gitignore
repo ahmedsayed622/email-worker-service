@@ -20,3 +20,6 @@ email-worker.service
 # Temporary files
 .codex_tmp_patch/
 *.tmp
+
+# Local documentation (not for repo)
+docs/FLOW.md
